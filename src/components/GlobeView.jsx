@@ -23,12 +23,14 @@ import {
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// Targeted regions with their exact geographical coordinates
+// Targeted regions with exact geographical coordinates
 const REGION_LOCATIONS = [
   { key: 'coorg', name: 'Coorg', lat: 12.3375, lng: 75.8069 },
   { key: 'ziro', name: 'Ziro Valley', lat: 27.5389, lng: 93.8378 },
   { key: 'rajasthan', name: 'Rajasthan', lat: 27.0238, lng: 74.2179 },
-  { key: 'kerala', name: 'Kerala', lat: 10.8505, lng: 76.2711 }
+  { key: 'kerala', name: 'Kerala', lat: 10.8505, lng: 76.2711 },
+  { key: 'varanasi', name: 'Varanasi', lat: 25.3176, lng: 82.9739 },
+  { key: 'hampi', name: 'Hampi', lat: 15.3350, lng: 76.4600 }
 ];
 
 // Helper: Convert Lat/Lng into 3D Vector coordinates on a sphere
@@ -129,16 +131,13 @@ export default function GlobeView({ onSelectRegion }) {
     // 📍 ADD 3D REGION PINS INSIDE EARTH GROUP
     const pinsList = [];
     REGION_LOCATIONS.forEach((loc) => {
-      // Pin dot geometry & glowing orange material
       const pinGeo = new THREE.SphereGeometry(0.025, 16, 16);
       const pinMat = new THREE.MeshBasicMaterial({ color: 0xff9933 });
       const pinMesh = new THREE.Mesh(pinGeo, pinMat);
 
-      // Position pin slightly above globe surface (radius 1 + 0.015)
       const pos = latLngToVector3(loc.lat, loc.lng, 1.015);
       pinMesh.position.copy(pos);
 
-      // Save key on object for Raycaster
       pinMesh.userData = { regionKey: loc.key, name: loc.name };
 
       earthGroup.add(pinMesh);
@@ -166,34 +165,36 @@ export default function GlobeView({ onSelectRegion }) {
     atmosphere.scale.setScalar(1.045);
     earthGroup.add(atmosphere);
 
-    // CLICK DETECTION FOR PINS & EARTH (RAYCASTER)
+    // CLICK DETECTION FOR PINS ONLY
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    let pointerDownPos = { x: 0, y: 0 };
 
-    const handleClick = (event) => {
+    const handlePointerDown = (event) => {
+      pointerDownPos = { x: event.clientX, y: event.clientY };
+    };
+
+    const handlePointerUp = (event) => {
+      const deltaX = Math.abs(event.clientX - pointerDownPos.x);
+      const deltaY = Math.abs(event.clientY - pointerDownPos.y);
+      if (deltaX > 5 || deltaY > 5) return;
+
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-      
-      // First check if any pin was clicked directly
+
       const pinIntersects = raycaster.intersectObjects(pinsList);
       if (pinIntersects.length > 0) {
         const clickedPin = pinIntersects[0].object;
         if (onSelectRegion) {
           onSelectRegion(clickedPin.userData.regionKey);
         }
-        return;
-      }
-
-      // Fallback: Check if globe body was clicked directly
-      const earthIntersects = raycaster.intersectObject(earth);
-      if (earthIntersects.length > 0 && onSelectRegion) {
-        onSelectRegion('coorg');
       }
     };
 
-    window.addEventListener('click', handleClick);
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointerup', handlePointerUp);
 
     // RENDERER & CONTROLS
     async function init() {
@@ -214,7 +215,9 @@ export default function GlobeView({ onSelectRegion }) {
         container.appendChild(renderer.domElement);
 
         controls = new OrbitControls(camera, renderer.domElement);
+        controls.rotateSpeed = 0.35;
         controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
         controls.enablePan = false;
         controls.enableZoom = true;
         controls.minDistance = 1.5;
@@ -254,7 +257,8 @@ export default function GlobeView({ onSelectRegion }) {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('click', handleClick);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointerup', handlePointerUp);
 
       if (renderer) {
         renderer.setAnimationLoop(null);
@@ -267,5 +271,15 @@ export default function GlobeView({ onSelectRegion }) {
     };
   }, [onSelectRegion]);
 
-  return <div ref={containerRef} style={{ width: '100vw', height: '100vh', position: 'absolute', inset: 0 }} />;
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        width: '100vw',
+        height: '100vh',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    />
+  );
 }
