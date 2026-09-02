@@ -1,15 +1,115 @@
-html,
-body,
-#root {
-  width: 100%;
-  height: 100%;
+/* Base Page Resets */
+body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  background: #000;
+  background-color: #050811;
+  color: #ffffff;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden; /* Prevents scrollbars from appearing over 3D canvas */
 }
 
-.globe-container {
+.app-container {
   width: 100vw;
   height: 100vh;
+  position: relative;
+}
+
+/* Navbar Layering */
+.navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  z-index: 10; /* Ensures navbar sits on top of 3D globe */
+  pointer-events: auto;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.logo span {
+  color: #ff9933; /* Indian saffron accent color */
+}
+
+.explore-btn {
+  background: #ff9933;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.explore-btn:hover {
+  transform: scale(1.05);
+  background: #e68a00;
+}
+
+/* Hero Content & Drag Interaction */
+.hero-content {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 10;
+  pointer-events: none; /* Allows mouse drags over text to pass through to globe */
+}
+
+.hero-content h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.hero-content p {
+  color: #cbd5e1;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Category Button Chips */
+.quick-chips {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  padding: 10px 20px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: auto; /* Re-enables clicking on the buttons specifically */
+}
+
+.quick-chips span {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.quick-chips button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.quick-chips button:hover {
+  background: #ff9933;
+  color: #000;
+  font-weight: 600;
+  border-color: #ff9933;
 }
