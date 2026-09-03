@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import GlobeView from './components/GlobeView.jsx';
 import ExplorerModal from './components/ExplorerModal.jsx';
+import HeritageChat from './components/HeritageChat.jsx';
 import './App.css';
 
 const FEATURED_CITIES = [
@@ -58,9 +59,13 @@ function App() {
 
   return (
     <div className="app-container">
+
       {/* Navigation Bar */}
       <header className="navbar">
-        <div className="logo">BHĀRAT <span>HERITAGE</span></div>
+        <div className="logo">
+          BHĀRAT <span>HERITAGE</span>
+        </div>
+
         <div className="nav-actions">
           <button className="explore-btn" onClick={scrollToGlobe}>
             Explore Globe ↓
@@ -70,40 +75,78 @@ function App() {
 
       {/* 🟢 PAGE 1: HERO LANDING & FEATURED CITIES */}
       <section className="hero-landing-page">
+
         <div className="hero-content">
           <h1>Discover India’s Rich Culture</h1>
-          <p>Explore traditional foods, heritage activities, and hidden gems across iconic destinations.</p>
+
+          <p>
+            Explore traditional foods, heritage activities, and hidden gems
+            across iconic destinations.
+          </p>
         </div>
 
         {/* 6 City Cards Grid */}
         <div className="city-cards-grid">
+
           {FEATURED_CITIES.map((city) => (
+
             <div 
               key={city.key} 
               className="city-card"
               onClick={() => setSelectedRegion(city.key)}
             >
+
               <div className="city-card-image-wrapper">
-                <img src={city.img} alt={city.name} className="city-card-image" />
+                <img
+                  src={city.img}
+                  alt={city.name}
+                  className="city-card-image"
+                />
               </div>
+
               <div className="city-card-content">
+
                 <h3>{city.name}</h3>
-                <span className="city-state">{city.state}</span>
-                <p>{city.desc}</p>
-                <span className="card-action">View Details →</span>
+
+                <span className="city-state">
+                  {city.state}
+                </span>
+
+                <p>
+                  {city.desc}
+                </p>
+
+                <span className="card-action">
+                  View Details →
+                </span>
+
               </div>
+
             </div>
+
           ))}
+
         </div>
 
-        <button className="scroll-down-btn" onClick={scrollToGlobe}>
+        <button
+          className="scroll-down-btn"
+          onClick={scrollToGlobe}
+        >
           Or Scroll Down to Explore the 3D Globe ↓
         </button>
+
       </section>
 
       {/* 🌐 PAGE 2: 3D GLOBE SECTION */}
-      <section ref={globeSectionRef} className="globe-section">
-        <GlobeView onSelectRegion={(regionKey) => setSelectedRegion(regionKey)} />
+      <section
+        ref={globeSectionRef}
+        className="globe-section"
+      >
+        <GlobeView
+          onSelectRegion={(regionKey) =>
+            setSelectedRegion(regionKey)
+          }
+        />
       </section>
 
       {/* Cultural Information Modal */}
@@ -113,6 +156,10 @@ function App() {
           onClose={() => setSelectedRegion(null)} 
         />
       )}
+
+      {/* 🤖 HERITAGE AI CHATBOX */}
+      <HeritageChat />
+
     </div>
   );
 }
